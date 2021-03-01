@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        <title>City Population</title>
+        
+        <!-- Set up the style of the map (i.e. size) and text for the web page -->
+        <style type="text/css">
+			html, body { height: 100%; margin: 0; padding: 5px;}
+			#map { height: 85%; width: 85%; margin-left: auto; margin-right: auto}
+		</style>
+        
+        <!-- ACCESS the code that runs Leaflet from the web -->
+        <!-- Leaflet CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+            integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+            crossorigin=""/>
+        
+        <!-- Leaflet JavaScript Library -->
+        <!-- Make sure you put this AFTER Leaflet's CSS -->
+        <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+            integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+            crossorigin=""></script>
+        
+        
+        
+        
+        <script> 
+            // base map
+            var OpenStreetMap_HOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, Tiles courtesy of <a href="http://hot.openstreetmap.org/" target="_blank">Humanitarian OpenStreetMap Team</a>'
+                });
+            
+            var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            });
+
+            var Esri_NatGeoWorldMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC',
+                maxZoom: 16
+            });
+
+            var Esri_WorldTopoMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+            });
+
+            // circles
+            var circle1 = L.circle([40.7305991, -73.9865811], {radius: (Math.sqrt(20009000)*100), color: 'red'}).bindPopup('City: New York<br>Population: 20009000');
+            var circle2 = L.circle([34.054935, -118.2444759], {radius: (Math.sqrt(15750000)*100), color: 'red'}).bindPopup('City: Los Angeles<br>Population: 15750000');
+            var circle3 = L.circle([41.8755546, -87.6244211], {radius: (Math.sqrt(9023000)*100), color: 'red'}).bindPopup('City: Chicago<br>Population: 9023000');
+            var circle4 = L.circle([37.7792808, -122.4192362], {radius: (Math.sqrt(6828000)*100), color: 'red'}).bindPopup('City: San Francisco<br>Population: 6828000');
+            var circle5 = L.circle([39.9523993, -75.1635898], {radius: (Math.sqrt(6003000)*100), color: 'red'}).bindPopup('City: Philadelphia<br>Population: 6003000');
+            var circle6 = L.circle([32.7762719, -96.7968558], {radius: (Math.sqrt(5685000)*100), color: 'red'}).bindPopup('City: Dallas<br>Population: 5685000');
+            var circle7 = L.circle([25.7742658, -80.1936588], {radius: (Math.sqrt(5513000)*100), color: 'red'}).bindPopup('City: Miami<br>Population: 5513000');
+            var circle8 = L.circle([29.7589382, -95.3676973], {radius: (Math.sqrt(5382000)*100), color: 'red'}).bindPopup('City: Houston<br>Population: 5382000');
+            var circle9 = L.circle([33.7490987, -84.3901848], {radius: (Math.sqrt(4743000)*100), color: 'red'}).bindPopup('City: Atlanta<br>Population: 4743000');
+            var circle10 = L.circle([38.8949549, -77.0366455], {radius: (Math.sqrt(4697000)*100), color: 'red'}).bindPopup('City: Washington<br>Population: 4697000');
+            var circle11 = L.circle([42.3604823, -71.0595677], {radius: (Math.sqrt(4407000)*100), color: 'red'}).bindPopup('City: Boston<br>Population: 4407000');
+            var circle12 = L.circle([42.3486635, -83.0567374], {radius: (Math.sqrt(4160000)*100), color: 'red'}).bindPopup('City: Detroit<br>Population: 4160000');
+            var circle13 = L.circle([33.4485866, -112.0773455], {radius: (Math.sqrt(3863000)*100), color: 'red'}).bindPopup('City: Phoenix<br>Population: 3863000');
+            var circle14 = L.circle([47.6038321, -122.3300623], {radius: (Math.sqrt(3446000)*100), color: 'red'}).bindPopup('City: Seattle<br>Population: 3446000');
+            var circle15 = L.circle([32.7174209, -117.1627713], {radius: (Math.sqrt(2985000)*100), color: 'red'}).bindPopup('City: San Diego<br>Population: 2985000');
+            var circle16 = L.circle([39.7391536, -104.9847033], {radius: (Math.sqrt(2716000)*100), color: 'red'}).bindPopup('City: Denver<br>Population: 2716000');
+            var circle17 = L.circle([44.9772995, -93.2654691], {radius: (Math.sqrt(2651000)*100), color: 'red'}).bindPopup('City: Minneapolis<br>Population: 2651000');
+            var circle18 = L.circle([39.2908816, -76.6107589], {radius: (Math.sqrt(2497000)*100), color: 'red'}).bindPopup('City: Baltimore<br>Population: 2497000');
+            var circle19 = L.circle([27.9477595, -82.4584439], {radius: (Math.sqrt(2442000)*100), color: 'red'}).bindPopup('City: Tampa<br>Population: 2442000');
+            var circle20 = L.circle([38.6272733, -90.1978888], {radius: (Math.sqrt(2246000)*100), color: 'red'}).bindPopup('City: St. Louis<br>Population: 2246000');
+
+            // make layer group
+            var citiesGroup = L.layerGroup([circle1,	circle2,	circle3,	circle4,	circle5,	circle6,	circle7,	circle8,	circle9,	circle10,
+            	circle11,	circle12,	circle13,	circle14,	circle15,	circle16,	circle17,	circle18,	circle19,	circle20,]);
+            
+            var basemaps = {
+            "<b>OSM Streets</b>" : OpenStreetMap_HOT,
+            "<b>ESRI Imagery</b>" : Esri_WorldImagery,
+            "<b>ESRI Topographic</b>" : Esri_WorldTopoMap,
+            "<b>ESRI Nat Geo</b>" : Esri_NatGeoWorldMap,
+            };
+
+            var overlays = {
+                "2010 City Population" :citiesGroup,
+            }
+            // Set up function to build the map
+            function initialize() {
+                var map = L.map('map', {
+                    center: [38.0, -92.0],
+                    zoom: 4,
+                    layers: [OpenStreetMap_HOT]
+                });
+                
+                L.control.layers(basemaps, overlays, {collapsed:false}).addTo(map);
+            }
+            // End initialize() function
+        
+        
+        
+        </script>
+    
+    </head>
+    
+    <body onload="initialize()">
+    
+    <div id="map"></div>
+    
+    </body>
+
+    
+   

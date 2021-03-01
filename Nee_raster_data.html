@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        <title>Raster- Leaflet</title>
+        
+        <!-- Set up the style of the map (i.e. size) and text for the web page -->
+        <style type="text/css">
+			html, body { height: 100%; margin: 0; padding: 5px;}
+			#map { height: 85%; width: 85%; margin-left: auto; margin-right: auto}
+		</style>
+        
+        <!-- ACCESS the code that runs Leaflet from the web -->
+        <!-- Leaflet CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+            integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+            crossorigin=""/>
+        
+        <!-- Leaflet JavaScript Library -->
+        <!-- Make sure you put this AFTER Leaflet's CSS -->
+        <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+            integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+            crossorigin=""></script>
+        
+        
+        
+        
+        <script> 
+            
+            
+            // Base Maps
+            var USGS_USImageryTopo = L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryTopo/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 20,
+                attribution: 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>'
+            });
+            
+            var CartoDB_Positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 19
+            });
+            
+            // Basemap group
+            var baseMaps = {
+                "Imagery": USGS_USImageryTopo,
+                "Plain Map": CartoDB_Positron
+            };
+            // Set up function to build the map
+            function initialize() {
+            
+                var map = L.map('map', {
+                    center: [36.0794962475, -112.132544174],   // Change this to center the map on your raster
+                    zoom: 13.5,                 // change this to zoom in closer to your raster 
+                    layers: [USGS_USImageryTopo]
+
+                });
+                
+                L.control.layers(baseMaps).addTo(map);
+                
+                // PUT YOUR RASTER LAYER HERE --> remember to include .addTo(map)
+                
+                var imageUrl = 'grand_canyon.png',
+                    imageBounds = [[36.116578754, -112.166198128], [36.042413741, -112.098890220]];
+                L.imageOverlay(imageUrl, imageBounds).addTo(map);
+                
+                
+            }
+            // End initialize() function
+        
+        
+        
+        </script>
+    
+    </head>
+    
+    <body onload="initialize()">
+    <div><h1 style="text-align: center; font-family: Verdana, Geneva, Tahoma, sans-serif;">Grand Canyon</h1></div>
+    <div id="map"></div>
+    
+    </body>
+
+    
+   

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        <title>Geojson- Leaflet</title>
+        
+        <!-- Set up the style of the map (i.e. size) and text for the web page -->
+        <style type="text/css">
+			html, body { height: 100%; margin: 5px; padding: 5px;}
+			#map { height: 85%; width: 85%; margin-left: auto; margin-right: auto}
+            .legend {
+                line-height: 18px;
+                color: #000000;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
+                background-color: rgba(255, 255, 255, .5);
+            }
+            .legend i {
+                width: 18px;
+                height: 18px;
+                float: left;
+                margin-right: 8px;
+                opacity: 1;
+            }
+		</style>
+        
+        <!-- ACCESS the code that runs Leaflet from the web -->
+        <!-- Leaflet CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+            integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+            crossorigin=""/>
+        
+        <!-- Leaflet JavaScript Library -->
+        <!-- Make sure you put this AFTER Leaflet's CSS -->
+        <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+            integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+            crossorigin=""></script>
+
+
+        
+        <!-- GeoJSON files-->
+        <script src="spatial_data/coal_flow_epsg4326.geojson"></script>
+        <script src="spatial_data/countries_epsg4326.geojson"></script>
+        <script src="spatial_data/ports_epsg4326.geojson"></script>
+        
+        <script> 
+            var OpenStreetMap_HOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, Tiles courtesy of <a href="http://hot.openstreetmap.org/" target="_blank">Humanitarian OpenStreetMap Team</a>'
+            });
+            var countries_layer = L.geoJson(countries, {
+                color : "#000000",
+                fillColor: "#1c1b1b",
+                weight: .5,
+            });
+
+            // lines 
+            function lineSymbology (feature) {
+                var tons = feature.properties.GRID_CODE;
+
+                // init
+                var lineColor = "#000000",
+                    lineWidth = 1;
+                
+                if (tons <= 250) {lineColor = "#feebe2", lineWidth = 2}
+                else if (tons > 250 && tons <= 1000) {lineColor = "#fbb4b9", lineWidth = 3}
+                else if (tons > 1000 && tons <= 5000) {lineColor = "##f768a1", lineWidth = 4}
+                else if (tons > 5000 && tons <= 10000) {lineColor = "#c51b8a", lineWidth = 5}
+                else {lineColor = "7a0177", lineWidth = 6};
+
+                return {
+                    color: lineColor,
+                    weight: lineWidth,
+                    opacity: 1,
+                };
+            }
+
+            var coal_flow_layer = L.geoJson(coal_flow, {style: lineSymbology});
+
+            // popups
+            //ports
+            function popups(feature, layer) {
+                layer.bindPopup("Location: <b>" + feature.properties.Location + "</b><br>Tons of Coal Delivered: <b>" + feature.properties.Coal + "</b> (in thousands)")
+            };
+
+            // ports
+            var portsPts = new L.geoJson(ports, {
+                pointToLayer: function(feature, latlng){
+                    return L.circleMarker(latlng, {
+                        radius: Math.sqrt(feature.properties.Coal),
+                        fillColor: "#fad4ee",
+                        color: "#c96dac",
+                        fillOpacity: .7,
+                        weight: .5,
+                    });
+                }, onEachFeature: popups
+            });
+
+            var baseMaps = {
+                "OpenStreetMap" : OpenStreetMap_HOT,
+                "Countries Polygons" : countries_layer,
+            };
+
+            var overLays = {
+                "Coal Routes" : coal_flow_layer,
+                "Ports" : portsPts,
+            }
+
+            // Legend for line 
+            // Used https://leafletjs.com/examples/choropleth/ as a reference
+            var legend = L.control({position: 'bottomright'});
+
+            legend.onAdd = function (map) {
+
+                var div = L.DomUtil.create('div', 'info legend'),
+                    colors = ['#feebe2','#fbb4b9','#f768a1','#c51b8a','#7a0177'];
+                    weights = [0, 250, 1000, 5000, 10000],
+                    labels = [];
+                    div.innerHTML += '<h3>Legend for the Coal Routes layer<h3>'
+                div.innerHTML += '<h4>Tons of Coal (in thousands)</h4>'
+                // loop through our density intervals and generate a label with a colored square for each interval
+                for (var i = 0; i < weights.length; i++) {
+                    div.innerHTML +=
+                        '<i style="background:' + colors[i] + '"></i> ' +
+                        weights[i] + (weights[i + 1] ? '&ndash;' + weights[i + 1] + '<br>' : '+');
+                }
+                return div;
+            };
+            // Set up function to build the map
+            function initialize() {
+                var map = L.map('map', {
+                    center: [20.0, 0.0],
+                    zoom: 2,
+                    layers: [OpenStreetMap_HOT],
+                });
+
+                L.control.layers(baseMaps, overLays, {collapsed: false}).addTo(map);
+
+                coal_flow_layer.on('add', function(e) {legend.addTo(map); });
+                coal_flow_layer.on('remove', function(e) {legend.remove(); });
+                // legend.addTo(map);
+            }
+            // End initialize() function
+        
+        
+        </script>
+    
+    </head>
+    
+    <body onload="initialize()">
+    <div><h2 style="font-family: verdana; text-align: center">Minard's Coal Map</h2></div>
+    <div id="map"></div>
+    <div><p style="font-family: verdana; margin: 20px;"> Most of the choices I made were for the color. For the countries layer, I chose a set of greys in order to make sure that the overlays stood out. For the overlays, I chose pink colors
+        because I liked them, they wouldn't be mistaken for rivers, and they matched each other well. I also added some transparency to the ports so that they didn't obscure place names. Finally, I decided to add a basic legend
+        since the coal routes layer doesn't really give the user a lot of information on its own. I also have the legend disappear when the layer is unchecked in order to minimize confusion. <br> Overall, I prefer this representation over
+        the static representation we did in lab 2 because the ability to zoom in and out and to view more information by clicking on each port is very helpful. </p></div>
+    </body>
+
+    
+   
